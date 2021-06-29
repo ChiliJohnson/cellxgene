@@ -29,3 +29,15 @@ namespace mangling on these definitions.  See webpack config for specifics.
   src: url("./fonts/RobotoCondensed-Bold.ttf") format("truetype");
   font-weight: 700;
 }
+
+::-webkit-scrollbar {
+  height: 14px; /* 5px top and bottom, 4px track */
+  width: 14px; /* 5px left and right, 4px track */
+}
+
+::-webkit-scrollbar-thumb {
+  background-clip: content-box;
+  background-color: #CED9E0; /* Colors.LIGHT_GRAY1 */ /* TODO(cc) revisit variable specification */
+  border: 5px solid transparent;
+  border-radius: 14px;
+}

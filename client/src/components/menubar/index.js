@@ -51,7 +51,7 @@ import { getEmbSubsetView } from "../../util/stateManager/viewStackHelpers";
     categoricalSelection: state.categoricalSelection,
     enableReembedding:
       state.config?.parameters?.["enable-reembedding"] ?? false,
-    dotplotEnabled: true /* TODO(colinmegill) #632 wire dotplot*/,
+    dotplotEnabled: state.layoutChoice.dotplot,
   };
 })
 class MenuBar extends React.PureComponent {
@@ -198,7 +198,10 @@ class MenuBar extends React.PureComponent {
     dispatch(actions.resetSubsetAction());
   };
 
-  handleDotplotToggle = () => {};
+  handleDotplotToggle = () => {
+    const { dispatch } = this.props;
+    dispatch({ type: "toggle dotplot" });
+  };
 
   render() {
     const {
@@ -270,9 +273,6 @@ class MenuBar extends React.PureComponent {
         <Tooltip
           content="Enable dotplot mode (hides embedding)"
           position="bottom"
-          disabled={
-            false /* TODO(colinmegill) #632 if no genesets or categories*/
-          }
         >
           <AnchorButton
             className={styles.menubarButton}
@@ -282,9 +282,6 @@ class MenuBar extends React.PureComponent {
             onClick={this.handleDotplotToggle}
             active={dotplotEnabled}
             intent={dotplotEnabled ? "primary" : "none"}
-            disabled={
-              false /* TODO(colinmegill) #632 if no genesets or categories*/
-            }
           />
         </Tooltip>
         <Tooltip

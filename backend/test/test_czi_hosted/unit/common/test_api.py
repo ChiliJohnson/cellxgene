@@ -382,8 +382,6 @@ class EndPoints(BaseTest):
         self.assertAlmostEqual(df["columns"][0][0], -0.16628358)
 
     def test_post_summaryvar(self):
-        # import pdb
-        # pdb.set_trace()
         index_col_name = self.schema["schema"]["annotations"]["var"]["index"]
         endpoint = "summarize/var"
         headers = {"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/octet-stream"}

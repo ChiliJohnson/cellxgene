@@ -3,12 +3,14 @@ import os
 import time
 from http import HTTPStatus
 import hashlib
+from unittest import skip
+from unittest.mock import patch
 
 import requests
 
 
 from backend.czi_hosted.common.config.app_config import AppConfig
-from backend.test import decode_fbs
+from backend.test import decode_fbs, FIXTURES_ROOT
 from backend.test.fixtures.fixtures import pbmc3k_colors
 from backend.test.test_czi_hosted.unit import BaseTest, skip_if
 
@@ -69,6 +71,7 @@ class EndPoints(BaseTest):
         self.assertIsNone(df["row_idx"])
         self.assertEqual(len(df["columns"]), df["n_cols"])
 
+    @skip("Reembeding is not currently supported in the hosted application")
     def test_put_layout_fbs(self):
         # first check that re-embedding is turned on
         self.app.auth.get_user_id = lambda : "123"
@@ -86,7 +89,6 @@ class EndPoints(BaseTest):
         data["filter"]["obs"]["index"] = list(range(100))
         data["method"] = "umap"
         result = self.client.put(url, json=data)
-
         self.assertEqual(result.status_code, HTTPStatus.OK)
         result_data = result.json()
         self.assertIsInstance(result_data, dict)
@@ -380,6 +382,8 @@ class EndPoints(BaseTest):
         self.assertAlmostEqual(df["columns"][0][0], -0.16628358)
 
     def test_post_summaryvar(self):
+        # import pdb
+        # pdb.set_trace()
         index_col_name = self.schema["schema"]["annotations"]["var"]["index"]
         endpoint = "summarize/var"
         headers = {"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/octet-stream"}
@@ -420,8 +424,19 @@ class EndPointsCxg(EndPoints):
     """Test Case for endpoints"""
     @classmethod
     def setUpClass(cls):
-        app_config = AppConfig()
-        app_config.update_default_dataset_config(embeddings__enable_reembedding=True, user_annotations__enable=False)
+        cls.app_config = AppConfig()
+        cls.app_config.update_server_config(
+            multi_dataset__dataroot = FIXTURES_ROOT,
+            authentication__type="test",
+            authentication__insecure_test_environment=True,
+            app__flask_secret_key="testing",
+            app__debug=True
+        )
+        cls.app_config.update_default_dataset_config(
+            embeddings__enable_reembedding=True,
+            user_annotations__enable=False,
+        )
+        super().setUpClass(cls.app_config)
 
     def test_get_genesets_json(self):
         self.app.auth.is_user_authenticated = lambda: True
@@ -529,4 +544,65 @@ brush_this_gene,,SIK1,\r
         result = self.client.put(url, json=test1)
 
         self.assertEqual(result.status_code, HTTPStatus.METHOD_NOT_ALLOWED)
+
+class DataLocator(EndPoints):
+    @classmethod
+    def setUpClass(cls):
+        cls.config = AppConfig()
+        cls.config.update_server_config(data_locator__s3__region_name="us-east-1")
+        cls.config.update_server_config(data_locator__api_base="api.test.cellxgene.com")
+        cls.config.update_server_config(
+            multi_dataset__dataroot=FIXTURES_ROOT,
+            authentication__type="test",
+            authentication__insecure_test_environment=True,
+            app__flask_secret_key="testing",
+            app__debug=True
+        )
+        cls.config.complete_config()
+        super().setUpClass(cls.config)
+
+    def test_initialize(self):
+        endpoint = "schema"
+        url = f"{self.URL_BASE}{endpoint}"
+        result = self.session.get(url)
+        self.assertEqual(result.status_code, HTTPStatus.OK)
+        self.assertEqual(result.headers["Content-Type"], "application/json")
+        result_data = result.json()
+        self.assertEqual(result_data["schema"]["dataframe"]["nObs"], 2638)
+        self.assertEqual(len(result_data["schema"]["annotations"]["obs"]), 2)
+        self.assertEqual(
+            len(result_data["schema"]["annotations"]["obs"]["columns"]),  5
+        )
+
+    def test_config(self):
+        # mock_get.return_value = {}
+        endpoint = "config"
+        url = f"{self.URL_BASE}{endpoint}"
+        result = self.session.get(url)
+        self.assertEqual(result.status_code, HTTPStatus.OK)
+        self.assertEqual(result.headers["Content-Type"], "application/json")
+        result_data = result.json()
+        self.assertIn("library_versions", result_data["config"])
+        self.assertEqual(result_data["config"]["displayNames"]["dataset"], "pbmc3k")
+
+    @patch('backend.czi_hosted.app.app.get_data_adaptor.requests.get')
+    def test_get_annotations_obs_fbs(self, mock_get):
+        mock_get.return_value = {}
+
+        endpoint = "annotations/obs"
+        url = f"{self.URL_BASE}{endpoint}"
+        header = {"Accept": "application/octet-stream"}
+        result = self.session.get(url, headers=header)
+        self.assertEqual(result.status_code, HTTPStatus.OK)
+        self.assertEqual(result.headers["Content-Type"], "application/octet-stream")
+        df = decode_fbs.decode_matrix_FBS(result.content)
+        self.assertEqual(df["n_rows"], 2638)
+        self.assertEqual(df["n_cols"], 5)
+        self.assertIsNotNone(df["columns"])
+        self.assertIsNone(df["row_idx"])
+        self.assertEqual(len(df["columns"]), df["n_cols"])
+        obs_index_col_name = self.schema["schema"]["annotations"]["obs"]["index"]
+        self.assertCountEqual(
+            df["col_idx"],
+            [obs_index_col_name, "n_genes", "percent_mito", "n_counts", "louvain"])
 

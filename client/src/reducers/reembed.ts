@@ -5,7 +5,7 @@ export const reembedController = (
   state = {
     pendingFetch: null,
   },
-  action
+  action: any
 ) => {
   switch (action.type) {
     case "reembed: request start": {

@@ -8,12 +8,12 @@ import Lasso from "./setupLasso";
 ******************************************/
 
 export default (
-  selectionToolType,
-  handleStartAction,
-  handleDragAction,
-  handleEndAction,
-  handleCancelAction,
-  viewport
+  selectionToolType: any,
+  handleStartAction: any,
+  handleDragAction: any,
+  handleEndAction: any,
+  handleCancelAction: any,
+  viewport: any
 ) => {
   const svg = d3.select("#graph-wrapper").select("#lasso-layer");
   if (svg.empty()) return {};
@@ -40,6 +40,7 @@ export default (
 
   if (selectionToolType === "lasso") {
     const lasso = Lasso()
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'on' does not exist on type 'void'.
       .on("end", handleEndAction)
       // FYI, Lasso doesn't generate drag
       .on("start", handleStartAction)

@@ -10,14 +10,18 @@ import LabelInput from "../labelInput";
 import { labelPrompt } from "./labelUtil";
 import actions from "../../actions";
 
+type State = any;
+
+// @ts-expect-error ts-migrate(1238) FIXME: Unable to resolve signature of class decorator whe... Remove this comment to see the full error message
 @connect((state) => ({
-  writableCategoriesEnabled: state.config?.parameters?.annotations ?? false,
-  schema: state.annoMatrix?.schema,
-  ontology: state.ontology,
-  userInfo: state.userInfo,
+  writableCategoriesEnabled:
+    (state as any).config?.parameters?.annotations ?? false,
+  schema: (state as any).annoMatrix?.schema,
+  ontology: (state as any).ontology,
+  userInfo: (state as any).userInfo,
 }))
-class Categories extends React.Component {
-  constructor(props) {
+class Categories extends React.Component<{}, State> {
+  constructor(props: {}) {
     super(props);
     this.state = {
       createAnnoModeActive: false,
@@ -27,7 +31,8 @@ class Categories extends React.Component {
     };
   }
 
-  handleCreateUserAnno = (e) => {
+  handleCreateUserAnno = (e: any) => {
+    // @ts-expect-error ts-migrate(2339) FIXME: Property 'dispatch' does not exist on type 'Readon... Remove this comment to see the full error message
     const { dispatch } = this.props;
     const { newCategoryText, categoryToDuplicate } = this.state;
     dispatch(
@@ -56,50 +61,48 @@ class Categories extends React.Component {
     });
   };
 
-  handleModalDuplicateCategorySelection = (d) => {
+  handleModalDuplicateCategorySelection = (d: any) => {
     this.setState({ categoryToDuplicate: d });
   };
 
-  categoryNameError = (name) => {
+  categoryNameError = (name: any) => {
     /*
-    return false if this is a LEGAL/acceptable category name or NULL/empty string,
-    or return an error type.
-    */
-
+        return false if this is a LEGAL/acceptable category name or NULL/empty string,
+        or return an error type.
+        */
     /* allow empty string */
     if (name === "") return false;
-
     /*
-    test for uniqueness against *all* annotation names, not just the subset
-    we render as categorical.
-    */
+        test for uniqueness against *all* annotation names, not just the subset
+        we render as categorical.
+        */
+    // @ts-expect-error ts-migrate(2339) FIXME: Property 'schema' does not exist on type 'Readonly... Remove this comment to see the full error message
     const { schema } = this.props;
-    const allCategoryNames = schema.annotations.obs.columns.map((c) => c.name);
-
+    const allCategoryNames = schema.annotations.obs.columns.map(
+      (c: any) => c.name
+    );
     /* check category name syntax */
     const error = AnnotationsHelpers.annotationNameIsErroneous(name);
     if (error) {
       return error;
     }
-
     /* disallow duplicates */
     if (allCategoryNames.indexOf(name) !== -1) {
       return "duplicate";
     }
-
     /* otherwise, no error */
     return false;
   };
 
-  handleChange = (name) => {
+  handleChange = (name: any) => {
     this.setState({ newCategoryText: name });
   };
 
-  handleSelect = (name) => {
+  handleSelect = (name: any) => {
     this.setState({ newCategoryText: name });
   };
 
-  instruction = (name) => {
+  instruction = (name: any) => {
     return labelPrompt(
       this.categoryNameError(name),
       "New, unique category name",
@@ -107,7 +110,7 @@ class Categories extends React.Component {
     );
   };
 
-  onExpansionChange = (catName) => {
+  onExpansionChange = (catName: any) => {
     const { expandedCats } = this.state;
     if (expandedCats.has(catName)) {
       const _expandedCats = new Set(expandedCats);
@@ -128,17 +131,21 @@ class Categories extends React.Component {
       expandedCats,
     } = this.state;
     const {
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'writableCategoriesEnabled' does not exis... Remove this comment to see the full error message
       writableCategoriesEnabled,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'schema' does not exist on type 'Readonly... Remove this comment to see the full error message
       schema,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'ontology' does not exist on type 'Readon... Remove this comment to see the full error message
       ontology,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'userInfo' does not exist on type 'Readon... Remove this comment to see the full error message
       userInfo,
     } = this.props;
     const ontologyEnabled = ontology?.enabled ?? false;
     /* all names, sorted in display order.  Will be rendered in this order */
+    // @ts-expect-error ts-migrate(2554) FIXME: Expected 2 arguments, but got 1.
     const allCategoryNames = ControlsHelpers.selectableCategoryNames(
       schema
     ).sort();
-
     return (
       <div
         style={{
@@ -146,6 +153,7 @@ class Categories extends React.Component {
         }}
       >
         <AnnoDialog
+          // @ts-expect-error ts-migrate(2322) FIXME: Type '{ isActive: any; title: string; instruction:... Remove this comment to see the full error message
           isActive={createAnnoModeActive}
           title="Create new category"
           instruction={this.instruction(newCategoryText)}
@@ -158,6 +166,7 @@ class Categories extends React.Component {
           handleCancel={this.handleDisableAnnoMode}
           annoInput={
             <LabelInput
+              // @ts-expect-error ts-migrate(2322) FIXME: Type '{ labelSuggestions: any; onChange: (name: an... Remove this comment to see the full error message
               labelSuggestions={ontologyEnabled ? ontology.terms : null}
               onChange={this.handleChange}
               onSelect={this.handleSelect}
@@ -172,6 +181,7 @@ class Categories extends React.Component {
           }
           annoSelect={
             <AnnoSelect
+              // @ts-expect-error ts-migrate(2322) FIXME: Type '{ handleModalDuplicateCategorySelection: (d:... Remove this comment to see the full error message
               handleModalDuplicateCategorySelection={
                 this.handleModalDuplicateCategorySelection
               }
@@ -212,12 +222,13 @@ class Categories extends React.Component {
 
         {/* READ ONLY CATEGORICAL FIELDS */}
         {/* this is duplicative but flat, could be abstracted */}
-        {allCategoryNames.map((catName) =>
+        {allCategoryNames.map((catName: any) =>
           !schema.annotations.obsByName[catName].writable &&
           (schema.annotations.obsByName[catName].categories?.length > 1 ||
             !schema.annotations.obsByName[catName].categories) ? (
             <Category
               key={catName}
+              // @ts-expect-error ts-migrate(2769) FIXME: No overload matches this call.
               metadataField={catName}
               onExpansionChange={this.onExpansionChange}
               isExpanded={expandedCats.has(catName)}
@@ -226,10 +237,11 @@ class Categories extends React.Component {
           ) : null
         )}
         {/* WRITEABLE FIELDS */}
-        {allCategoryNames.map((catName) =>
+        {allCategoryNames.map((catName: any) =>
           schema.annotations.obsByName[catName].writable ? (
             <Category
               key={catName}
+              // @ts-expect-error ts-migrate(2769) FIXME: No overload matches this call.
               metadataField={catName}
               onExpansionChange={this.onExpansionChange}
               isExpanded={expandedCats.has(catName)}

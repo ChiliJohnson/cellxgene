@@ -6,7 +6,7 @@ import {
 } from "../components/framework/toasters";
 import { _switchEmbedding } from "./embedding";
 
-function abortableFetch(request, opts, timeout = 0) {
+function abortableFetch(request: any, opts: any, timeout = 0) {
   const controller = new AbortController();
   const { signal } = controller;
 
@@ -22,7 +22,7 @@ function abortableFetch(request, opts, timeout = 0) {
   };
 }
 
-async function doReembedFetch(dispatch, getState) {
+async function doReembedFetch(dispatch: any, getState: any) {
   const state = getState();
   let cells = state.annoMatrix.rowIndex.labels();
 
@@ -54,6 +54,7 @@ async function doReembedFetch(dispatch, getState) {
   });
   const res = await af.ready();
 
+  // @ts-expect-error ts-migrate(2531) FIXME: Object is possibly 'null'.
   if (res.ok && res.headers.get("Content-Type").includes("application/json")) {
     return res;
   }
@@ -71,7 +72,7 @@ async function doReembedFetch(dispatch, getState) {
 functions below are dispatch-able
 */
 export function requestReembed() {
-  return async (dispatch, getState) => {
+  return async (dispatch: any, getState: any) => {
     try {
       const res = await doReembedFetch(dispatch, getState);
       const schema = await res.json();

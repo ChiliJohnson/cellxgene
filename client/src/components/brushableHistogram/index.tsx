@@ -30,27 +30,31 @@ const MARGIN_MINI = {
 const WIDTH_MINI = 120 - MARGIN_MINI.LEFT - MARGIN_MINI.RIGHT;
 const HEIGHT_MINI = 15 - MARGIN_MINI.TOP - MARGIN_MINI.BOTTOM;
 
+// @ts-expect-error ts-migrate(1238) FIXME: Unable to resolve signature of class decorator whe... Remove this comment to see the full error message
 @connect((state, ownProps) => {
+  // @ts-expect-error ts-migrate(2339) FIXME: Property 'isObs' does not exist on type '{}'.
   const { isObs, isUserDefined, isGeneSetSummary, field } = ownProps;
   const myName = makeContinuousDimensionName(
     { isObs, isUserDefined, isGeneSetSummary },
     field
   );
   return {
-    annoMatrix: state.annoMatrix,
-    isScatterplotXXaccessor: state.controls.scatterplotXXaccessor === field,
-    isScatterplotYYaccessor: state.controls.scatterplotYYaccessor === field,
-    continuousSelectionRange: state.continuousSelection[myName],
-    isColorAccessor: state.colors.colorAccessor === field,
+    annoMatrix: (state as any).annoMatrix,
+    isScatterplotXXaccessor:
+      (state as any).controls.scatterplotXXaccessor === field,
+    isScatterplotYYaccessor:
+      (state as any).controls.scatterplotYYaccessor === field,
+    continuousSelectionRange: (state as any).continuousSelection[myName],
+    isColorAccessor: (state as any).colors.colorAccessor === field,
   };
 })
 class HistogramBrush extends React.PureComponent {
-  static watchAsync(props, prevProps) {
+  static watchAsync(props: any, prevProps: any) {
     return !shallowEqual(props.watchProps, prevProps.watchProps);
   }
 
   /* memoized closure to prevent HistogramHeader unecessary repaint */
-  handleColorAction = memoize((dispatch) => (field, isObs) => {
+  handleColorAction = memoize((dispatch) => (field: any, isObs: any) => {
     if (isObs) {
       dispatch({
         type: "color by continuous metadata",
@@ -61,14 +65,20 @@ class HistogramBrush extends React.PureComponent {
     }
   });
 
-  onBrush = (selection, x, eventType) => {
+  // @ts-expect-error ts-migrate(6133) FIXME: 'selection' is declared but its value is never rea... Remove this comment to see the full error message
+  onBrush = (selection: any, x: any, eventType: any) => {
     const type = `continuous metadata histogram ${eventType}`;
     return () => {
       const {
+        // @ts-expect-error ts-migrate(2339) FIXME: Property 'dispatch' does not exist on type 'Readon... Remove this comment to see the full error message
         dispatch,
+        // @ts-expect-error ts-migrate(2339) FIXME: Property 'field' does not exist on type 'Readonly<... Remove this comment to see the full error message
         field,
+        // @ts-expect-error ts-migrate(2339) FIXME: Property 'isObs' does not exist on type 'Readonly<... Remove this comment to see the full error message
         isObs,
+        // @ts-expect-error ts-migrate(2339) FIXME: Property 'isUserDefined' does not exist on type 'R... Remove this comment to see the full error message
         isUserDefined,
+        // @ts-expect-error ts-migrate(2339) FIXME: Property 'isGeneSetSummary' does not exist on type... Remove this comment to see the full error message
         isGeneSetSummary,
       } = this.props;
 
@@ -95,13 +105,19 @@ class HistogramBrush extends React.PureComponent {
     };
   };
 
-  onBrushEnd = (selection, x) => {
+  // @ts-expect-error ts-migrate(6133) FIXME: 'selection' is declared but its value is never rea... Remove this comment to see the full error message
+  onBrushEnd = (selection: any, x: any) => {
     return () => {
       const {
+        // @ts-expect-error ts-migrate(2339) FIXME: Property 'dispatch' does not exist on type 'Readon... Remove this comment to see the full error message
         dispatch,
+        // @ts-expect-error ts-migrate(2339) FIXME: Property 'field' does not exist on type 'Readonly<... Remove this comment to see the full error message
         field,
+        // @ts-expect-error ts-migrate(2339) FIXME: Property 'isObs' does not exist on type 'Readonly<... Remove this comment to see the full error message
         isObs,
+        // @ts-expect-error ts-migrate(2339) FIXME: Property 'isUserDefined' does not exist on type 'R... Remove this comment to see the full error message
         isUserDefined,
+        // @ts-expect-error ts-migrate(2339) FIXME: Property 'isGeneSetSummary' does not exist on type... Remove this comment to see the full error message
         isGeneSetSummary,
       } = this.props;
       const minAllowedBrushSize = 10;
@@ -152,6 +168,7 @@ class HistogramBrush extends React.PureComponent {
   };
 
   handleSetGeneAsScatterplotX = () => {
+    // @ts-expect-error ts-migrate(2339) FIXME: Property 'dispatch' does not exist on type 'Readon... Remove this comment to see the full error message
     const { dispatch, field } = this.props;
     dispatch({
       type: "set scatterplot x",
@@ -160,6 +177,7 @@ class HistogramBrush extends React.PureComponent {
   };
 
   handleSetGeneAsScatterplotY = () => {
+    // @ts-expect-error ts-migrate(2339) FIXME: Property 'dispatch' does not exist on type 'Readon... Remove this comment to see the full error message
     const { dispatch, field } = this.props;
     dispatch({
       type: "set scatterplot y",
@@ -169,10 +187,15 @@ class HistogramBrush extends React.PureComponent {
 
   removeHistogram = () => {
     const {
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'dispatch' does not exist on type 'Readon... Remove this comment to see the full error message
       dispatch,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'field' does not exist on type 'Readonly<... Remove this comment to see the full error message
       field,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'isColorAccessor' does not exist on type ... Remove this comment to see the full error message
       isColorAccessor,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'isScatterplotXXaccessor' does not exist ... Remove this comment to see the full error message
       isScatterplotXXaccessor,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'isScatterplotYYaccessor' does not exist ... Remove this comment to see the full error message
       isScatterplotYYaccessor,
     } = this.props;
     dispatch({
@@ -199,11 +222,13 @@ class HistogramBrush extends React.PureComponent {
   };
 
   fetchAsyncProps = async () => {
+    // @ts-expect-error ts-migrate(2339) FIXME: Property 'annoMatrix' does not exist on type 'Read... Remove this comment to see the full error message
     const { annoMatrix, width } = this.props;
 
     const { isClipped } = annoMatrix;
 
     const query = this.createQuery();
+    // @ts-expect-error ts-migrate(2488) FIXME: Type 'any[] | null' must have a '[Symbol.iterator]... Remove this comment to see the full error message
     const df = await annoMatrix.fetch(...query);
     const column = df.icol(0);
 
@@ -262,7 +287,7 @@ class HistogramBrush extends React.PureComponent {
   };
 
   // eslint-disable-next-line class-methods-use-this -- instance method allows for memoization per annotation
-  calcHistogramCache(col, newMargin, newWidth, newHeight) {
+  calcHistogramCache(col: any, newMargin: any, newWidth: any, newHeight: any) {
     /*
      recalculate expensive stuff, notably bins, summaries, etc.
     */
@@ -270,34 +295,31 @@ class HistogramBrush extends React.PureComponent {
     const summary = col.summarize(); /* this is memoized, so it's free the second time you call it */
     const { min: domainMin, max: domainMax } = summary;
     const numBins = 40;
-    const {
-      TOP: topMargin,
-      LEFT: leftMargin,
-    } = newMargin; /* changes with mini */
-
-    histogramCache.domain = [
-      domainMin,
-      domainMax,
-    ]; /* doesn't change with mini */
-
-    histogramCache.x = d3
+    const { TOP: topMargin, LEFT: leftMargin } = newMargin;
+    (histogramCache as any).domain = [domainMin, domainMax];
+    /* doesn't change with mini */ (histogramCache as any).x = d3
       .scaleLinear()
       .domain([domainMin, domainMax])
       .range([leftMargin, leftMargin + newWidth]);
 
-    histogramCache.bins = histogramContinuous(col, numBins, [
+    // @ts-expect-error ts-migrate(2554) FIXME: Expected 4 arguments, but got 3.
+    (histogramCache as any).bins = histogramContinuous(col, numBins, [
       domainMin,
       domainMax,
-    ]); /* memoized */
-    histogramCache.binWidth = (domainMax - domainMin) / numBins;
+    ]);
+    /* memoized */ (histogramCache as any).binWidth =
+      (domainMax - domainMin) / numBins;
 
-    histogramCache.binStart = (i) => domainMin + i * histogramCache.binWidth;
-    histogramCache.binEnd = (i) =>
-      domainMin + (i + 1) * histogramCache.binWidth;
+    (histogramCache as any).binStart = (i: any) =>
+      domainMin + i * (histogramCache as any).binWidth;
+    (histogramCache as any).binEnd = (i: any) =>
+      domainMin + (i + 1) * (histogramCache as any).binWidth;
 
-    const yMax = histogramCache.bins.reduce((l, r) => (l > r ? l : r));
+    const yMax = (histogramCache as any).bins.reduce((l: any, r: any) =>
+      l > r ? l : r
+    );
 
-    histogramCache.y = d3
+    (histogramCache as any).y = d3
       .scaleLinear()
       .domain([0, yMax])
       .range([topMargin + newHeight, topMargin]);
@@ -306,6 +328,7 @@ class HistogramBrush extends React.PureComponent {
   }
 
   createQuery() {
+    // @ts-expect-error ts-migrate(2339) FIXME: Property 'isObs' does not exist on type 'Readonly<... Remove this comment to see the full error message
     const { isObs, isGeneSetSummary, field, setGenes, annoMatrix } = this.props;
     const { schema } = annoMatrix;
     if (isObs) {
@@ -343,21 +366,35 @@ class HistogramBrush extends React.PureComponent {
 
   render() {
     const {
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'dispatch' does not exist on type 'Readon... Remove this comment to see the full error message
       dispatch,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'annoMatrix' does not exist on type 'Read... Remove this comment to see the full error message
       annoMatrix,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'field' does not exist on type 'Readonly<... Remove this comment to see the full error message
       field,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'isColorAccessor' does not exist on type ... Remove this comment to see the full error message
       isColorAccessor,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'isUserDefined' does not exist on type 'R... Remove this comment to see the full error message
       isUserDefined,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'isGeneSetSummary' does not exist on type... Remove this comment to see the full error message
       isGeneSetSummary,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'isScatterplotXXaccessor' does not exist ... Remove this comment to see the full error message
       isScatterplotXXaccessor,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'isScatterplotYYaccessor' does not exist ... Remove this comment to see the full error message
       isScatterplotYYaccessor,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'zebra' does not exist on type 'Readonly<... Remove this comment to see the full error message
       zebra,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'continuousSelectionRange' does not exist... Remove this comment to see the full error message
       continuousSelectionRange,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'isObs' does not exist on type 'Readonly<... Remove this comment to see the full error message
       isObs,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'mini' does not exist on type 'Readonly<{... Remove this comment to see the full error message
       mini,
+      // @ts-expect-error ts-migrate(2339) FIXME: Property 'setGenes' does not exist on type 'Readon... Remove this comment to see the full error message
       setGenes,
     } = this.props;
 
+    // @ts-expect-error ts-migrate(2339) FIXME: Property 'width' does not exist on type 'Readonly<... Remove this comment to see the full error message
     let { width } = this.props;
     if (!width) {
       width = mini ? WIDTH_MINI : WIDTH;
@@ -386,7 +423,7 @@ class HistogramBrush extends React.PureComponent {
         </Async.Rejected>
         <Async.Fulfilled>
           {(asyncProps) =>
-            asyncProps.OK2Render ? (
+            (asyncProps as any).OK2Render ? (
               <div
                 id={`histogram_${fieldForId}`}
                 data-testid={`histogram-${field}`}
@@ -398,6 +435,7 @@ class HistogramBrush extends React.PureComponent {
               >
                 {!mini && isObs ? (
                   <HistogramHeader
+                    // @ts-expect-error ts-migrate(2322) FIXME: Type '{ fieldId: any; isColorBy: any; isObs: any; ... Remove this comment to see the full error message
                     fieldId={field}
                     isColorBy={isColorAccessor}
                     isObs={isObs}
@@ -416,9 +454,11 @@ class HistogramBrush extends React.PureComponent {
                 <Histogram
                   field={field}
                   fieldForId={fieldForId}
-                  display={asyncProps.isSingleValue ? "none" : "block"}
+                  display={(asyncProps as any).isSingleValue ? "none" : "block"}
                   histogram={
-                    mini ? asyncProps.miniHistogram : asyncProps.histogram
+                    mini
+                      ? (asyncProps as any).miniHistogram
+                      : (asyncProps as any).histogram
                   }
                   width={width}
                   height={mini ? HEIGHT_MINI : HEIGHT}
@@ -431,14 +471,15 @@ class HistogramBrush extends React.PureComponent {
                 />
                 {!mini && (
                   <HistogramFooter
+                    // @ts-expect-error ts-migrate(2322) FIXME: Type '{ isGeneSetSummary: any; isObs: any; display... Remove this comment to see the full error message
                     isGeneSetSummary={isGeneSetSummary}
                     isObs={isObs}
                     displayName={field}
-                    hideRanges={asyncProps.isSingleValue}
-                    rangeMin={asyncProps.unclippedRange[0]}
-                    rangeMax={asyncProps.unclippedRange[1]}
-                    rangeColorMin={asyncProps.unclippedRangeColor[0]}
-                    rangeColorMax={asyncProps.unclippedRangeColor[1]}
+                    hideRanges={(asyncProps as any).isSingleValue}
+                    rangeMin={(asyncProps as any).unclippedRange[0]}
+                    rangeMax={(asyncProps as any).unclippedRange[1]}
+                    rangeColorMin={(asyncProps as any).unclippedRangeColor[0]}
+                    rangeColorMax={(asyncProps as any).unclippedRangeColor[1]}
                   />
                 )}
               </div>

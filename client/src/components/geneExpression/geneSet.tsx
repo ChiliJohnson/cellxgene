@@ -12,25 +12,30 @@ import HistogramBrush from "../brushableHistogram";
 
 import { diffexpPopNamePrefix1, diffexpPopNamePrefix2 } from "../../globals";
 
+type State = any;
+
+// @ts-expect-error ts-migrate(1238) FIXME: Unable to resolve signature of class decorator whe... Remove this comment to see the full error message
 @connect((state, ownProps) => {
   return {
-    world: state.world,
-    userDefinedGenes: state.controls.userDefinedGenes,
-    userDefinedGenesLoading: state.controls.userDefinedGenesLoading,
-    isColorAccessor: state.colors.colorAccessor === ownProps.setName,
+    world: (state as any).world,
+    userDefinedGenes: (state as any).controls.userDefinedGenes,
+    userDefinedGenesLoading: (state as any).controls.userDefinedGenesLoading,
+    isColorAccessor:
+      (state as any).colors.colorAccessor === (ownProps as any).setName,
   };
 })
-class GeneSet extends React.Component {
-  _memoGenesToUpper = memoize(this._genesToUpper, (arr) => arr);
+class GeneSet extends React.Component<{}, State> {
+  // @ts-expect-error ts-migrate(2729) FIXME: Property '_genesToUpper' is used before its initia... Remove this comment to see the full error message
+  _memoGenesToUpper = memoize(this._genesToUpper, (arr: any) => arr);
 
-  constructor(props) {
+  constructor(props: {}) {
     super(props);
     this.state = {
       isOpen: false,
     };
   }
 
-  _genesToUpper = (listGenes) => {
+  _genesToUpper = (listGenes: any) => {
     // Has to be a Map to preserve index
     const upperGenes = new Map();
     for (let i = 0, { length } = listGenes; i < length; i += 1) {
@@ -41,6 +46,7 @@ class GeneSet extends React.Component {
   };
 
   fetchGenes = () => {
+    // @ts-expect-error ts-migrate(2339) FIXME: Property 'world' does not exist on type 'Readonly<... Remove this comment to see the full error message
     const { world, dispatch, setGenes } = this.props;
     const varIndexName = world.schema.annotations.var.index;
 
@@ -81,16 +87,18 @@ class GeneSet extends React.Component {
   };
 
   renderGenes() {
+    // @ts-expect-error ts-migrate(2339) FIXME: Property 'setName' does not exist on type 'Readonl... Remove this comment to see the full error message
     const { setName, setGenes, setGenesWithDescriptions } = this.props;
 
     return (
       <div data-testclass="gene-set-genes">
-        {setGenes.map((gene) => {
+        {setGenes.map((gene: any) => {
           const { geneDescription } = setGenesWithDescriptions.get(gene);
 
           return (
             <Gene
               key={gene}
+              // @ts-expect-error ts-migrate(2322) FIXME: Type '{ key: any; gene: any; geneDescription: any;... Remove this comment to see the full error message
               gene={gene}
               geneDescription={geneDescription}
               geneset={setName}
@@ -102,6 +110,7 @@ class GeneSet extends React.Component {
   }
 
   render() {
+    // @ts-expect-error ts-migrate(2339) FIXME: Property 'setName' does not exist on type 'Readonl... Remove this comment to see the full error message
     const { setName, setGenes, genesetDescription } = this.props;
     const { isOpen } = this.state;
     const genesetNameLengthVisible = 150; /* this magic number determines how much of a long geneset name we see */
@@ -124,6 +133,7 @@ class GeneSet extends React.Component {
         >
           <span
             role="menuitem"
+            // @ts-expect-error ts-migrate(2322) FIXME: Type 'string' is not assignable to type 'number | ... Remove this comment to see the full error message
             tabIndex="0"
             data-testclass={testClass}
             data-testid={`${setName}:geneset-expand`}
@@ -163,6 +173,7 @@ class GeneSet extends React.Component {
             )}
           </span>
           <div>
+            {/* @ts-expect-error ts-migrate(2322) FIXME: Type '{ isOpen: any; genesetsEditable: true; genes... Remove this comment to see the full error message */}
             <GenesetMenus isOpen={isOpen} genesetsEditable geneset={setName} />
           </div>
         </div>
@@ -176,6 +187,7 @@ class GeneSet extends React.Component {
         </div>
         {isOpen && !genesetIsEmpty && setGenes.length > 0 && (
           <HistogramBrush
+            // @ts-expect-error ts-migrate(2769) FIXME: No overload matches this call.
             isGeneSetSummary
             field={setName}
             setGenes={setGenes}
@@ -183,6 +195,7 @@ class GeneSet extends React.Component {
         )}
         {isOpen && !genesetIsEmpty && this.renderGenes()}
         <EditGenesetNameDialogue
+          // @ts-expect-error ts-migrate(2322) FIXME: Type '{ parentGeneset: any; parentGenesetDescripti... Remove this comment to see the full error message
           parentGeneset={setName}
           parentGenesetDescription={genesetDescription}
         />

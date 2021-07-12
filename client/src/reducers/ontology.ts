@@ -5,7 +5,7 @@ const Ontology = (
     termSet: null, // a Set object containing all terms, for fast lookup
     loading: true,
   },
-  action
+  action: any
 ) => {
   switch (action.type) {
     case "configuration load complete": {

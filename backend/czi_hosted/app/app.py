@@ -1,5 +1,4 @@
 import datetime
-import json
 import logging
 from functools import wraps
 from http import HTTPStatus
@@ -7,8 +6,6 @@ from urllib.parse import urlparse
 import hashlib
 import os
 
-import requests
-import requests_cache
 from flask import (
     Flask,
     redirect,

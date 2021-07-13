@@ -609,6 +609,7 @@ class TestDataLocatorMockApi(BaseTest):
             mock_get._mock_call_args[1]['url'],
             f"http://{self.data_locator_api_base}/datasets/meta?url={self.config.server_config.get_web_base_url()}{self.TEST_DATASET_URL_BASE}")
 
+        # TODO @madison refactor mock out s3 instead of MatrixDataLoaderX
         # Check mocked MatrixDataLoader correctly loads schema
         result_data = json.loads(result.data)
         self.assertEqual(result_data["schema"]["dataframe"]["nObs"], 2638)
@@ -660,6 +661,7 @@ class TestDataLocatorMockApi(BaseTest):
         self.assertEqual(result.status_code, HTTPStatus.OK)
         self.assertEqual(result.headers["Content-Type"], "application/octet-stream")
 
+        # TODO @madison refactor mock out s3 instead of MatrixDataLoader
         # check mocked MatrixDataLoader is returning correctly
         df = decode_fbs.decode_matrix_FBS(result.data)
         self.assertEqual(df["n_rows"], 2638)

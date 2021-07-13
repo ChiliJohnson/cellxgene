@@ -8,6 +8,7 @@ import hashlib
 import os
 
 import requests
+import requests_cache
 from flask import (
     Flask,
     redirect,
@@ -117,20 +118,6 @@ def get_data_adaptor(url_dataroot=None, dataset=None):
     server_config = config.server_config
     dataset_key = None
     cache_manager = current_app.matrix_data_cache_manager
-    if server_config.data_locator__api_base:
-        headers = {"Content-Type": "application/json"}
-        curr_url = f"{server_config.get_web_base_url()}/{url_dataroot}/{dataset}.cxg"
-        response = requests.get(
-            url=f"http://{server_config.data_locator__api_base}/datasets/meta?url={curr_url}",
-            headers=headers
-        )
-        if response.status_code == 200:
-            dataset_identifiers = json.loads(response.body)
-            if dataset_identifiers['s3_uri'] and not dataset_identifiers["tombstoned"]:
-                bucket = dataset_identifiers["s3_uri"].split("/")[2]
-                datapath = f"s3://{bucket}/"
-                dataset_key = "/".join(dataset_identifiers["s3_uri"].split("/")[3:])
-                return cache_manager.data_adaptor(dataset_key, datapath, config)
     if dataset is None:
         datapath = server_config.single_dataset__datapath
     else:
@@ -153,8 +140,7 @@ def get_data_adaptor(url_dataroot=None, dataset=None):
     if datapath is None:
         return common_rest.abort_and_log(HTTPStatus.BAD_REQUEST, "Invalid dataset NONE", loglevel=logging.INFO)
 
-    cache_manager = current_app.matrix_data_cache_manager
-    return cache_manager.data_adaptor(dataset_key, datapath, config)
+    return cache_manager.data_adaptor(dataset_key, datapath, config, dataset)
 
 
 def requires_authentication(func):
@@ -177,6 +163,8 @@ def rest_get_data_adaptor(func):
                 data_adaptor.set_uri_path(f"{self.url_dataroot}/{dataset}")
                 return func(self, data_adaptor)
         except DatasetAccessError as e:
+            import pdb
+            pdb.set_trace()
             return common_rest.abort_and_log(
                 e.status_code, f"Invalid dataset {dataset}: {e.message}", loglevel=logging.INFO, include_exc_info=True
             )
